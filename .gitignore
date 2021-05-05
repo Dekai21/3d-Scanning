@@ -1,0 +1,9 @@
+.vscode/
+build/
+*.txt
+*.pdf
+*.zip
+
+data/
+*.tgz
+tmp/
