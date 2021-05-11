@@ -196,12 +196,6 @@ private:
 			b(i) = m_funcSamp.m_val[i];
 		}
 
-
-
-
-
-
-
 		// build the system matrix and the right hand side of the normal equation
 		m_systemMatrix = A.transpose() * A;
 		m_rhs = A.transpose() * b;
