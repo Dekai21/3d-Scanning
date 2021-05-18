@@ -1,6 +1,7 @@
 .vscode/
 build/
 *.txt
+!CMakeLists.txt
 *.pdf
 *.zip
 
@@ -8,3 +9,4 @@ data/
 *.tgz
 tmp/
 FreeImage/
+
