@@ -64,6 +64,13 @@ private:
 		const MatrixXf& U = svd.matrixU();
 		const MatrixXf& V = svd.matrixV();
 		Matrix3f R = U * V.transpose();
+		if(R.determinant() == -1){
+			Matrix3f N;
+			N << 1, 0,  0, 
+				 0, 1,  0, 
+				 0, 0, -1;
+			R = U * N * V.transpose();
+		}
 		
         return R;
 	}
