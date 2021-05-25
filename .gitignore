@@ -9,4 +9,8 @@ data/
 *.tgz
 tmp/
 FreeImage/
+CMakeFiles/
 
+
+# exe4
+!exe4/results/output_*.txt
