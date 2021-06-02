@@ -14,8 +14,10 @@ struct RegistrationCostFunction
 	template<typename T>
 	bool operator()(const T* const theta, const T* const tx, const T* const ty, T* residual) const
 	{
-		const T _x = ceres::cos(theta[0]) * point_1.x - ceres::sin(theta[0]) * point_1.y + tx[0];
-		const T _y = ceres::sin(theta[0]) * point_1.x + ceres::cos(theta[0]) * point_1.y + ty[0];
+		auto cos_theta = ceres::cos(theta[0]);
+		auto sin_theta = ceres::sin(theta[0]);
+		const T _x =  cos_theta * point_1.x - sin_theta * point_1.y + tx[0];
+		const T _y =  sin_theta * point_1.x + cos_theta * point_1.y + ty[0];
 		residual[0] = weight.w * (_x - point_2.x);
 		residual[1] = weight.w * (_y - point_2.y);
 

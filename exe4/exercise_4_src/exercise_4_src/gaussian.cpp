@@ -17,7 +17,7 @@ struct GaussianCostFunction
 	{
 		// TODO: Implement the cost function
 		const T variance = sigma[0] * sigma[0];
-		const T _y = exp( -pow(point.x - mu[0], 2)/ 2.0 / variance) / sqrt(2.0 * M_PI * variance);
+		const T _y = exp( -pow(point.x - mu[0], 2) / 2.0 / variance) / sqrt(2.0 * M_PI * variance);
 		residual[0] = point.y - _y;
 
 		return true;

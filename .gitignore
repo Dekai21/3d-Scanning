@@ -14,3 +14,7 @@ CMakeFiles/
 
 # exe4
 !exe4/results/output_*.txt
+
+# exe5
+exe5/Flann/flann/
+exe5/results/*.off
