@@ -18,3 +18,6 @@ CMakeFiles/
 # exe5
 exe5/Flann/flann/
 exe5/results/*.off
+
+#final
+final/detector_compare/
