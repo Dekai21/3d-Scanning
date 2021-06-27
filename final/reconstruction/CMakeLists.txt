@@ -16,6 +16,7 @@ include_directories(
 )
 
 message(STATUS "CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
+message(STATUS "OpenCV_INCLUDE_DIRS: ${OpenCV_INCLUDE_DIRS}")
 
 set(HEADERS 
     "include.h"
@@ -24,6 +25,9 @@ set(HEADERS
 set(SOURCES
     main.cpp
     orb.cpp
+    undistort.cpp
+    FindEssentialMatrix.cpp
+    RecoverRT.cpp
 )
 
 add_executable( main ${HEADERS} ${SOURCES}  )
