@@ -30,5 +30,13 @@ set(SOURCES
     RecoverRT.cpp
 )
 
+set(KIT
+    kitti_kit.cpp
+)
+
+
 add_executable( main ${HEADERS} ${SOURCES}  )
 target_link_libraries( main ${OpenCV_LIBS} )
+
+add_executable( kit ${HEADERS} ${KIT}  )
+target_link_libraries( kit ${OpenCV_LIBS} )

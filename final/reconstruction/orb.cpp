@@ -35,13 +35,14 @@ int OrbDetector (Mat img_1, Mat img_2,
     descriptor->compute ( img_2, keypoints_2, descriptors_2 );
 
     if(IMAGE_SHOW){
-        Mat outimg1;
-        drawKeypoints( img_1, keypoints_1, outimg1, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
-        imshow("ORB特征点",outimg1);
+        // Mat outimg1;
+        // drawKeypoints( img_1, keypoints_1, outimg1, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
+        // imshow("ORB特征点",outimg1);
     }
 
     //-- 第三步:对两幅图像中的BRIEF描述子进行匹配，使用 Hamming 距离
     vector<DMatch> matches;
+    vector<DMatch> good_matches;
     //BFMatcher matcher ( NORM_HAMMING );
     matcher->match ( descriptors_1, descriptors_2, matches );
 
@@ -55,19 +56,22 @@ int OrbDetector (Mat img_1, Mat img_2,
     }
 
 
-    // assert(matches.size() >= num_keypoints); 
+    assert(matches.size() >= num_keypoints); 
     if(matches.size() < num_keypoints) num_keypoints = matches.size();
     for( size_t m = 0; m < num_keypoints; m++ ){
         int i1 = matches[m].queryIdx;
         int i2 = matches[m].trainIdx;
         keypoints_left.push_back ( keypoints_1[i1] );
         keypoints_right.push_back ( keypoints_2[i2] );
+        good_matches.push_back(matches[m]);
     }
 
     if(IMAGE_SHOW){
-        Mat outimg2;
-        drawKeypoints( img_1, keypoints_left, outimg2, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
-        imshow("ORB特征点(前n个)",outimg2);
+        Mat outimg2_left, img_goodmatch;
+        // drawKeypoints( img_1, keypoints_left, outimg2_left, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
+        // imshow("ORB特征点(前n个) left",outimg2_left);
+        drawMatches ( img_1, keypoints_1, img_2, keypoints_2, good_matches, img_goodmatch );
+        imshow ( "优化后匹配点对", img_goodmatch );
         waitKey(0);
     }
 

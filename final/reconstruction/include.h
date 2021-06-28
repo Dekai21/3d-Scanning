@@ -1,4 +1,6 @@
 #include <iostream>
+#include <dirent.h>
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -34,4 +36,4 @@ void Undistort(Mat distorted_left_image, Mat distorted_right_image,
 
 Mat FindEssentialMatrix(Mat fundamental_mat);
 
-struct transformation RecoverRT(Mat R1, Mat R2, Mat T, vector<KeyPoint> keypoints_left, vector<KeyPoint> keypoints_right);
+struct transformation RecoverRT(Mat R1, Mat R2, Mat T, vector<Point2f> keypoints_left, vector<Point2f> keypoints_right);
