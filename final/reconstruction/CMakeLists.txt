@@ -28,6 +28,7 @@ set(SOURCES
     undistort.cpp
     FindEssentialMatrix.cpp
     RecoverRT.cpp
+    helper.cpp
 )
 
 set(KIT

@@ -21,3 +21,6 @@ exe5/results/*.off
 
 #final
 final/detector_compare/
+!final/reconstruction/test_images/kitti_test_01/*
+!final/reconstruction/test_images/kitti_test_01/*/data/
+!final/reconstruction/test_images/*/*/data/

@@ -16,24 +16,47 @@ struct transformation{
     cv::Mat t;
 };
 
-// // K_02
-// cv::Mat left_rgb_camera_matrix = (cv::Mat_<double>(3,3) << 9.597910e+02, 0.000000e+00, 6.960217e+02, 
-//                                                             0.000000e+00, 9.569251e+02, 2.241806e+02, 
-//                                                             0.000000e+00, 0.000000e+00, 1.000000e+00);
+enum name_set{KITTI_2011_09_26_drive_0048, KITTI_2011_09_26_drive_0113, KITTI_TEST, MATLAB_TEST};
 
-// // K_03
-// cv::Mat right_rgb_camera_matrix = (cv::Mat_<double>(3,3) << 9.037596e+02, 0.000000e+00, 6.957519e+02, 
-//                                                             0.000000e+00, 9.019653e+02, 2.242509e+02, 
-//                                                             0.000000e+00, 0.000000e+00, 1.000000e+00);
+struct Dataset{
+    int name;
+    bool rectified; 
+    bool distort; // 是否畸变
+    bool given_points; // 是否手动给特征点
+};
 
+/**
+ * 使用ORB进行特征点检测
+ * @param img_1 左图
+ * @param img_2 右图
+ * @param keypoints_left 左特征点
+ * @param num_keypoints 选择特征点的数量
+ */
 int OrbDetector (Mat img_1, Mat img_2, 
-                 vector<KeyPoint>& keypoints_left, vector<KeyPoint>& keypoints_right,
+                 vector<Point2f>& keypoints_left, vector<Point2f>& keypoints_right,
                  size_t num_keypoints);
 
 
+/**
+ * 对图像进行去畸变
+ */
 void Undistort(Mat distorted_left_image, Mat distorted_right_image, 
                Mat& undistorted_left_image,  Mat& undistorted_right_image);
 
-Mat FindEssentialMatrix(Mat fundamental_mat);
+// 由基础矩阵计算本质矩阵， E = K2^T * F * K1
+Mat FindEssentialMatrix(Mat fundamental_mat, struct Dataset dataset);
 
-struct transformation RecoverRT(Mat R1, Mat R2, Mat T, vector<Point2f> keypoints_left, vector<Point2f> keypoints_right);
+// 从R和t的4种可能组合中获取正确的解
+struct transformation RecoverRT(Mat R1, Mat R2, Mat T, vector<Point2f> keypoints_left, vector<Point2f> keypoints_right, struct Dataset dataset);
+
+// 获取相机内参
+void GetIntrinsics(struct Dataset dataset, cv::Mat& left_rgb_camera_matrix, cv::Mat& right_rgb_camera_matrix);
+
+// 获取数据集的路径
+String GetDirPath(struct Dataset dataset);
+
+// 手动输入特征点坐标
+void GetPoints(vector<cv::Point2f>& keypoints_left, vector<cv::Point2f>& keypoints_right, struct Dataset dataset);
+
+// 获取数据集中图片的完整路径
+void getFilesList(String dirpath, vector<String> &left_image_paths, vector<String> &right_image_paths);

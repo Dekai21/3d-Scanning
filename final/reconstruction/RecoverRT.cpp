@@ -5,36 +5,9 @@
 using namespace cv;
 using namespace std;
 
-// // K_02
-// cv::Mat left_rgb_camera_matrix_ = (cv::Mat_<double>(3,3) << 9.597910e+02, 0.000000e+00, 6.960217e+02, 
-//                                                             0.000000e+00, 9.569251e+02, 2.241806e+02, 
-//                                                             0.000000e+00, 0.000000e+00, 1.000000e+00);
+bool JudgeRT(struct transformation transformation, vector<Point2f> keypoints_left, vector<Point2f> keypoints_right, double& scale, struct Dataset dataset);
 
-// // K_03
-// cv::Mat right_rgb_camera_matrix_ = (cv::Mat_<double>(3,3) << 9.037596e+02, 0.000000e+00, 6.957519e+02, 
-//                                                             0.000000e+00, 9.019653e+02, 2.242509e+02, 
-//                                                             0.000000e+00, 0.000000e+00, 1.000000e+00);
-
-// rectified camera parameters
-// K_02
-cv::Mat left_rgb_camera_matrix_ = (cv::Mat_<double>(3,3) << 721.5377, 0, 609.5593, 0, 721.5377, 172.854, 0, 0, 1);
-
-// K_03
-cv::Mat right_rgb_camera_matrix_ = (cv::Mat_<double>(3,3) << 721.5377, 0, 609.5593, 0, 721.5377, 172.854, 0, 0, 1);
-
-// // matlab
-// // K_02
-// cv::Mat left_rgb_camera_matrix_ = (cv::Mat_<double>(3,3) << 844.310547, 0, 243.413315, 0, 1202.508301, 281.529236, 0, 0, 1);
-
-// // K_03
-// cv::Mat right_rgb_camera_matrix_ = (cv::Mat_<double>(3,3) << 852.721008, 0, 252.021805, 0, 1215.657349, 288.587189, 0, 0, 1);
-
-cv::Mat left_rgb_camera_matrix_inv = left_rgb_camera_matrix_.inv();
-cv::Mat right_rgb_camera_matrix_inv = right_rgb_camera_matrix_.inv();
-
-bool JudgeRT(struct transformation transformation, vector<Point2f> keypoints_left, vector<Point2f> keypoints_right, double& scale);
-
-struct transformation RecoverRT(Mat R1, Mat R2, Mat T, vector<Point2f> keypoints_left, vector<Point2f> keypoints_right){
+struct transformation RecoverRT(Mat R1, Mat R2, Mat T, vector<Point2f> keypoints_left, vector<Point2f> keypoints_right, struct Dataset dataset){
     assert(keypoints_left.size() == keypoints_right.size());
 
     // Mat T_ = T.resize(3);
@@ -52,9 +25,9 @@ struct transformation RecoverRT(Mat R1, Mat R2, Mat T, vector<Point2f> keypoints
     int count_success = 0;
     double scale = 0.0;
     for(auto transformation:transformations){
-        if(JudgeRT(transformation, keypoints_left, keypoints_right, scale)){
+        if(JudgeRT(transformation, keypoints_left, keypoints_right, scale, dataset)){
             count_success++;
-            // transformation.t *= scale;
+            transformation.t *= scale;
             transformation_return = transformation;
         }
     }
@@ -64,11 +37,22 @@ struct transformation RecoverRT(Mat R1, Mat R2, Mat T, vector<Point2f> keypoints
         cout<<"t: "<<transformation_return.t<<endl;
         cout<<"scale: "<<scale<<endl;
     }
-    assert(count_success == 1);
+    // assert(count_success == 1);
+    if(count_success != 1){
+        cout<<"the number of the correct solution of R and t should be 1"<<endl;
+        exit(0);
+    }
     return transformation_return;
 }
 
-bool JudgeRT(struct transformation transformation, vector<Point2f> keypoints_left, vector<Point2f> keypoints_right, double& scale){
+bool JudgeRT(struct transformation transformation, vector<Point2f> keypoints_left, vector<Point2f> keypoints_right, 
+             double& scale, struct Dataset dataset){
+
+    Mat left_rgb_camera_matrix, right_rgb_camera_matrix;
+    GetIntrinsics(dataset, left_rgb_camera_matrix, right_rgb_camera_matrix); 
+    cv::Mat left_rgb_camera_matrix_inv = left_rgb_camera_matrix.inv();
+    cv::Mat right_rgb_camera_matrix_inv = right_rgb_camera_matrix.inv();
+
     // 构建M矩阵
     size_t num_points = keypoints_left.size();
     Mat M = Mat::zeros(cv::Size(num_points+1, 3*num_points), CV_64FC1);
@@ -107,6 +91,8 @@ bool JudgeRT(struct transformation transformation, vector<Point2f> keypoints_lef
             // cout<<"x1.size(): "<<x1.size()<<endl;
             // cout<<"x1.type(): "<<x1.type()<<endl;
             // cout<<"t.size(): "<<t.size()<<endl;
+            // cout<<"x1: "<<x1<<endl;
+            // cout<<"x2: "<<x2<<endl;
         }
 
         tmp1 = x2_hat * R * x1;
@@ -145,11 +131,11 @@ bool JudgeRT(struct transformation transformation, vector<Point2f> keypoints_lef
     // double gamma = (V.at<double>(num_points-2, num_points) + V.at<double>(num_points-1, num_points) + V.at<double>(num_points, num_points))/3;
 
     // 根据符号来判断该R和T是否正确
-    if(gamma<0){
+    if(gamma < 0){
         gamma = -gamma;
         lambda = -lambda;
     }
-    lambda = lambda / gamma;
+    // lambda = lambda / gamma;
     if(DEBUG_PRINT){
         // cout<<"lambda.type(): "<<lambda.type()<<endl;
     }
@@ -157,7 +143,7 @@ bool JudgeRT(struct transformation transformation, vector<Point2f> keypoints_lef
     int success_1 = 0;
     int success_2 = 0;
     for(int i = 0; i < num_points; i++){
-        if(lambda.at<double>(i,0)){
+        if(lambda.at<double>(i,0) > 0.0){
             success_1 ++;
         }
         _x1.at<double>(0,0) = keypoints_left[i].x;
@@ -165,8 +151,8 @@ bool JudgeRT(struct transformation transformation, vector<Point2f> keypoints_lef
         _x1.at<double>(2,0) = 1.0;
         x1 = left_rgb_camera_matrix_inv * _x1;
         x1 = x1 * lambda.at<double>(i,0);
-        x2 = R * x1 + t;
-        if(x2.at<double>(2,0)>0){
+        x2 = R * x1 + t * gamma;
+        if(x2.at<double>(2,0) > 0){
             success_2 ++;
         }
     }

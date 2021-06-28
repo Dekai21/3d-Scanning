@@ -8,9 +8,18 @@ using namespace cv;
 
 bool LessSort (DMatch a, DMatch b) { return (a.distance < b.distance); }
 
+// 将vector中的KeyPoint转化为Point2f
+void ConvertKeypointsVector(std::vector<KeyPoint>src, std::vector<cv::Point2f>& dst){
+    Point2f point;
+    for(int i = 0; i<src.size(); i++){
+        point.x = src[i].pt.x;
+        point.y = src[i].pt.y;
+        dst.push_back(point);
+    }
+}
 
 int OrbDetector (Mat img_1, Mat img_2, 
-                 vector<KeyPoint>& keypoints_left, vector<KeyPoint>& keypoints_right, 
+                 vector<Point2f>& keypoints_left, vector<Point2f>& keypoints_right, 
                  size_t num_keypoints = 10)
 {
 
@@ -55,14 +64,14 @@ int OrbDetector (Mat img_1, Mat img_2,
         }
     }
 
-
+    vector<KeyPoint> _keypoints_left, _keypoints_right;
     assert(matches.size() >= num_keypoints); 
     if(matches.size() < num_keypoints) num_keypoints = matches.size();
     for( size_t m = 0; m < num_keypoints; m++ ){
         int i1 = matches[m].queryIdx;
         int i2 = matches[m].trainIdx;
-        keypoints_left.push_back ( keypoints_1[i1] );
-        keypoints_right.push_back ( keypoints_2[i2] );
+        _keypoints_left.push_back ( keypoints_1[i1] );
+        _keypoints_right.push_back ( keypoints_2[i2] );
         good_matches.push_back(matches[m]);
     }
 
@@ -74,6 +83,9 @@ int OrbDetector (Mat img_1, Mat img_2,
         imshow ( "优化后匹配点对", img_goodmatch );
         waitKey(0);
     }
+
+    ConvertKeypointsVector(_keypoints_left, keypoints_left);
+    ConvertKeypointsVector(_keypoints_right, keypoints_right);
 
 
     // //-- 第四步:匹配点对筛选
