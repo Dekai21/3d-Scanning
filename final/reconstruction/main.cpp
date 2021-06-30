@@ -13,7 +13,7 @@ int main(int argc, char*argv[]){
     // dataset.name = MATLAB_TEST;
     dataset.rectified = 1;
     dataset.distort = 0;
-    dataset.given_points = 1; 
+    dataset.given_points = 0; 
 
     // 对kitti数据集中的img2和img3文件夹进行遍历
     String dir_path = GetDirPath(dataset);
