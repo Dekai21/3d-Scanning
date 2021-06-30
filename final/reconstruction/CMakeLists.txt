@@ -4,8 +4,23 @@ project(reconstruction)
 set( CMAKE_BUILD_TYPE "Release" )
 set( CMAKE_CXX_FLAGS "-std=c++11 -O3" )
 
+LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+
 # find_package( OpenCV 3.1 REQUIRED )
+find_Package(G2O REQUIRED)
+find_Package(Eigen3 REQUIRED)
+# find_Package(Ceres REQUIRED)
+# find_Package(Sophus REQUIRED)
+# find_Package(CSparse REQUIRED)
 find_package( OpenCV 3.2 REQUIRED )
+
+SET(G2O_LIBS "/usr/local/lib/libg2o_csparse_extension.so" ${G2O_STUFF_LIBRARY} ${G2O_CORE_LIBRARY}  "/usr/local/lib/libg2o_types_sba.so" cxsparse)
+
+message("CSPARSE_INCLUDE_DIR: ${CSPARSE_INCLUDE_DIR}")
+message("G2O_CSPARSE_EXTENSION_LIBRARY: ${G2O_CSPARSE_EXTENSION_LIBRARY}")
+message("G2O_STUFF_LIBRARY: ${G2O_STUFF_LIBRARY}")
+
 
 include_directories( 
     ${OpenCV_INCLUDE_DIRS} 
@@ -13,6 +28,7 @@ include_directories(
     ${CSPARSE_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
     "/usr/include/eigen3/"
+    ${PROJECT_SOURCE_DIR} ${EIGEN3_INCLUDE_DIR} ${CSPARSE_INCLUDE_DIR}
 )
 
 message(STATUS "CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}")
@@ -35,9 +51,24 @@ set(KIT
     kitti_kit.cpp
 )
 
+set(SGBM
+    sgbm.cpp
+    orb.cpp
+    undistort.cpp
+    FindEssentialMatrix.cpp
+    RecoverRT.cpp
+    helper.cpp
+)
+
 
 add_executable( main ${HEADERS} ${SOURCES}  )
 target_link_libraries( main ${OpenCV_LIBS} )
 
 add_executable( kit ${HEADERS} ${KIT}  )
 target_link_libraries( kit ${OpenCV_LIBS} )
+
+add_executable( sgbm ${HEADERS} ${SGBM}  )
+target_link_libraries( sgbm ${OpenCV_LIBS} )
+
+add_executable(ba bundle_adjustment.cpp)
+target_link_libraries(ba ${G2O_LIBS}  ${OpenCV_LIBS})

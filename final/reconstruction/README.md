@@ -1,5 +1,21 @@
 # Reconstruction
-特征点检测法 -> 八点法获取R和t -> 确定t的scale -> rectify -> dense matching 
+- 特征点检测和匹配
+  - ORB
+  - to do: SIFT
+- 计算R和t
+  - 八点法获取R和t + 特征点深度
+  - bundle adjustment计算R和t + 特征点深度
+- Rectify
+  - to do: 但是感觉即使用bundle adjustment得到的R和t精度也不够
+- Dense matching
+  - semi global matching
+  - 基于学习
+  - to do： 
+    - block matching
+    - 调参面板
+- 深度图质量评估
+  - to do 
+- 可视化: 由深度图和相机内参得到点云
 
 # Dataset 
 - KITTI_TEST
@@ -18,16 +34,20 @@
 
 
 # 存在的问题
-* 目前即使通过手动给点，计算得到的t的scale也不太正确。根据KITTI数据集给定的标定参数，t应该为 [ 0.53267121, -0.00526146,  0.00782809] (考虑到rectify前后optical center位置不变， 即 T02-T03), 但目前的计算结果和这个有较大的差异；
-* 在MATLAB_TEST中， 答案中 t = [-0.4427, -0.0166, 0.8965], gamma = 0.0081, 即 t*gamma = [-0.00358587, -0.00013446,  0.00726165]. 本程序得到的结果为 [-0.00887002165298002, -0.0002242175976263845, 0.0108172731965549], 这个结果差异似乎还不是很大。
+
 
 # 已验证
 - KITTI数据集中的K (calibration matrix) 在经过rectified后, 发生了变化 (kitti_kit.cpp)
+- 八点法的鲁棒性较差，得到的R和t精度不行
+- 计算R和t需要很多特征点 (200+?)
 
 
 # Note
 * 目前undistort.cpp中的相机内参和畸变参数为直接赋值，如果引入其他的需要去畸变的数据集需要注意。
 
-
+# 环境
+- OpenCV 3.2
+- Eigen 3
+- g2o @ 9b41a4e
 
     

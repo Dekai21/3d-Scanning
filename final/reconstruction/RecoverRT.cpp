@@ -14,6 +14,9 @@ struct transformation RecoverRT(Mat R1, Mat R2, Mat T, vector<Point2f> keypoints
     // T = T.t();
     if(DEBUG_PRINT){
         cout<<"RecoverRT"<<endl;
+        cout<<"R1: "<<R1<<endl;
+        cout<<"R2: "<<R2<<endl;
+        cout<<"T: "<<T<<endl;
         cout<<"T.size(): "<<T.size()<<endl;
     }
     struct transformation transformation_1, transformation_2, transformation_3, transformation_4, transformation_return;
@@ -143,7 +146,7 @@ bool JudgeRT(struct transformation transformation, vector<Point2f> keypoints_lef
     int success_1 = 0;
     int success_2 = 0;
     for(int i = 0; i < num_points; i++){
-        if(lambda.at<double>(i,0) > 0.0){
+        if(lambda.at<double>(i,0) >= 0.0){
             success_1 ++;
         }
         _x1.at<double>(0,0) = keypoints_left[i].x;
@@ -152,7 +155,7 @@ bool JudgeRT(struct transformation transformation, vector<Point2f> keypoints_lef
         x1 = left_rgb_camera_matrix_inv * _x1;
         x1 = x1 * lambda.at<double>(i,0);
         x2 = R * x1 + t * gamma;
-        if(x2.at<double>(2,0) > 0){
+        if(x2.at<double>(2,0) >= 0){
             success_2 ++;
         }
     }
