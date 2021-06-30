@@ -57,7 +57,8 @@
 - disparity map from sgm
   ![left_disp](./results/left_disp.png)
 - R和t的估算
-  - 八点法
+  ![R_T](./results/Screenshot%20from%202021-06-30%2017-16-09.png)
+  <!-- - 八点法
   
     - R和t:
   $$
@@ -123,6 +124,6 @@
       1.597899999998976e-05
     \end{matrix}
     \right]
-  $$
+  $$ -->
 
 
