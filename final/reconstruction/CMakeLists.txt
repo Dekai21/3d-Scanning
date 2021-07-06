@@ -14,6 +14,7 @@ find_Package(Eigen3 REQUIRED)
 # find_Package(Sophus REQUIRED)
 # find_Package(CSparse REQUIRED)
 find_package( OpenCV 3.2 REQUIRED )
+# find_package( PCL REQUIRED )
 
 SET(G2O_LIBS "/usr/local/lib/libg2o_csparse_extension.so" ${G2O_STUFF_LIBRARY} ${G2O_CORE_LIBRARY}  "/usr/local/lib/libg2o_types_sba.so" cxsparse)
 
@@ -58,6 +59,7 @@ set(SGBM
     FindEssentialMatrix.cpp
     RecoverRT.cpp
     helper.cpp
+    pointcloud.cpp
 )
 
 

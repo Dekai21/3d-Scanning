@@ -22,6 +22,7 @@
 - KITTI_TEST
   - ./test_images/kitti_test_01
   - 这个数据集中包含左右两张图像， 是KITTI中rectified的两张图像(rectified KITTI - 2011_09_26_drive_0113_sync - 0.png)
+  - 增加: 2011_09_26_drive_0048_sync - 1.png
 - MATLAB_TEST
   - ./test_images/matlab
   - 这个数据集中包含左右两张rectified的图像，来源于CV2的exe6
@@ -54,10 +55,16 @@
 # 实验结果
 - KITTI rectified image (left rgb)
   ![left_rgb](./results/left.png)
-- disparity map from sgm
-  ![left_disp](./results/left_disp.png)
 - R和t的估算
   ![R_T](./results/Screenshot%20from%202021-06-30%2017-16-09.png)
+- disparity map from sgm
+  ![left_disp](./results/left_disp.png)
+- depth
+  ![depth](./results/depth_vis_decimeter.jpg)
+- point cloud
+  ![pc1](./results/kitti_test_pointcloud00.png)
+  ![pc2](./results/kitti_test_pointcloud01.png)
+
   <!-- - 八点法
   
     - R和t:

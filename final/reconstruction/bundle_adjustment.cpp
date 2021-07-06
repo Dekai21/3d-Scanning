@@ -59,37 +59,9 @@ void ConvertKeypointsVector(std::vector<KeyPoint>src, std::vector<cv::Point2f>& 
 }
 
 
-int  findCorrespondingPoints( const cv::Mat& img_1, const cv::Mat& img_2, vector<cv::Point2f>& points1, vector<cv::Point2f>& points2 , int choose_match_num)
+int  findCorrespondingPoints( const cv::Mat& img_1, const cv::Mat& img_2, 
+                              vector<cv::Point2f>& points1, vector<cv::Point2f>& points2 , int choose_match_num)
 {
-    // cv::ORB orb;
-    // vector<cv::KeyPoint> kp1, kp2;
-    // cv::Mat desp1, desp2;
-    // orb( img1, cv::Mat(), kp1, desp1 );
-    // orb( img2, cv::Mat(), kp2, desp2 );
-    // cout<<"分别找到了"<<kp1.size()<<"和"<<kp2.size()<<"个特征点"<<endl;
-    
-    // cv::Ptr<cv::DescriptorMatcher>  matcher = cv::DescriptorMatcher::create( "BruteForce-Hamming");
-    
-    // double knn_match_ratio=0.8;
-    // vector< vector<cv::DMatch> > matches_knn;
-    // matcher->knnMatch( desp1, desp2, matches_knn, 2 );
-    // vector< cv::DMatch > matches;
-    // for ( size_t i=0; i<matches_knn.size(); i++ )
-    // {
-    //     if (matches_knn[i][0].distance < knn_match_ratio * matches_knn[i][1].distance )
-    //         matches.push_back( matches_knn[i][0] );
-    // }
-    
-    // if (matches.size() <= 20) //匹配点太少
-    //     return false;
-    
-    // for ( auto m:matches )
-    // {
-    //     points1.push_back( kp1[m.queryIdx].pt );
-    //     points2.push_back( kp2[m.trainIdx].pt );
-    // }
-
-    /////// 
 
     //-- 初始化
     std::vector<KeyPoint> keypoints_1, keypoints_2;
@@ -157,15 +129,12 @@ int  findCorrespondingPoints( const cv::Mat& img_1, const cv::Mat& img_2, vector
     return true;
 }
 
+
+// 使用方法： ./ba ${匹配点的数量}
+// 选择 200+ 对匹配可以获得比较好的效果，默认为240对
+// 目前仅仅支持在rectified后的KITTI图像上进行，如果更改数据集需要手动修改全局变量 cx, cy, fx, fy
+
 int main( int argc, char** argv ){
-    // 使用方法: ./ba ${num_match_keypoints}
-
-
-    // cv::Mat img1 = cv::imread( argv[1] ); 
-    // cv::Mat img2 = cv::imread( argv[2] ); 
-
-    // cv::Mat img1 = cv::imread( "./data/1.png" ); 
-    // cv::Mat img2 = cv::imread( "./data/2.png" ); 
 
     cv::Mat img1 = cv::imread( "../test_images/kitti_test_01/image_02/data/left.png" ); 
     cv::Mat img2 = cv::imread( "../test_images/kitti_test_01/image_03/data/right.png" ); 

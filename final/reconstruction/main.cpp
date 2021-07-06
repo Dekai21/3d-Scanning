@@ -1,4 +1,5 @@
 #include "include.h"
+
 #define DEBUG_PRINT 1
 #define IMAGE_SHOW 1
 
@@ -13,7 +14,7 @@ int main(int argc, char*argv[]){
     // dataset.name = MATLAB_TEST;
     dataset.rectified = 1;
     dataset.distort = 0;
-    dataset.given_points = 0; 
+    dataset.given_points = 0; // 手动给点还是用特征点检测
 
     // 对kitti数据集中的img2和img3文件夹进行遍历
     String dir_path = GetDirPath(dataset);
@@ -21,7 +22,7 @@ int main(int argc, char*argv[]){
     getFilesList(dir_path, left_image_paths, right_image_paths);
 
     for(int i = 0; i<left_image_paths.size(); i++){
-        // 参数设置， 后期可以改为从json文件读入
+        
         String left = left_image_paths[i];
         String right = right_image_paths[i];
 
@@ -56,6 +57,7 @@ int main(int argc, char*argv[]){
             waitKey(0);
         }
         else{
+            // 采用ORB进行特征点检测
             OrbDetector(img_1, img_2, keypoints_left, keypoints_right, num_keypoints);
             // if(DEBUG_PRINT) cout<<"keypoints_left.size(): "<<keypoints_left.size()<<endl;
         }        
@@ -65,13 +67,14 @@ int main(int argc, char*argv[]){
         Mat essential_mat = FindEssentialMatrix(fundamental_mat, dataset);
         // cout<<"essential_mat: "<<essential_mat<<endl;
 
-        // 由本质矩阵恢复出R和T
+        // 由本质矩阵恢复出R和T, 注意这里的T仅表示方向，因为其L2-norm固定为1
         Mat R1, R2, T;
         decomposeEssentialMat(essential_mat, R1, R2, T);
 
         // 选择正确的R和T
         struct transformation transformation = RecoverRT(R1, R2, T, keypoints_left, keypoints_right, dataset);
         if(DEBUG_PRINT){
+            cout<<"R and t from eight-point method:"<<endl;
             cout<<"R: "<<transformation.R<<endl;
             cout<<"t: "<<transformation.t<<endl<<endl;
         }

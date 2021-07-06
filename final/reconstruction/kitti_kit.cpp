@@ -6,6 +6,8 @@ using namespace cv;
 // 参考： http://ros-developer.com/2019/01/01/decomposing-projection-using-opencv-and-c/
 // 验证了rectify的相机参数
 
+// 这个程序主要用于得到rectified后的KITTI图像的相机内参, 由结果可以确信rectified后两个相机的orientation相同， translation为0.5327190420453419米，这个结果和论文中的标注接近
+
 int main(int argc, char*argv[]){
     Mat P_2 = (cv::Mat_<double>(3,4) << 7.215377e+02, 0.000000e+00, 6.095593e+02, 4.485728e+01,
                                         0.000000e+00, 7.215377e+02, 1.728540e+02, 2.163791e-01,
@@ -67,3 +69,6 @@ int main(int argc, char*argv[]){
 // t_23: [-0.5327119287764802;
 //  0.002752896950590371;
 //  -1.597899999998976e-05]
+
+// -0.5327119287764802, 0.002752896950590371, -1.597899999998976e-05
+// norm: 0.5327190420453419 -> baseline
