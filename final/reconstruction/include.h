@@ -25,6 +25,8 @@ struct transformation{
 
 enum name_set{KITTI_2011_09_26_drive_0048, KITTI_2011_09_26_drive_0113, KITTI_TEST, MATLAB_TEST};
 
+enum stereo_matching{SEMI_GLOBAL_MATCHING, BLOCK_MATCHING};
+
 struct Dataset{
     int name;
     bool rectified; 

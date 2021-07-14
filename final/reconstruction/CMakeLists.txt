@@ -52,8 +52,8 @@ set(KIT
     kitti_kit.cpp
 )
 
-set(SGBM
-    sgbm.cpp
+set(MATCHING
+    matching.cpp
     orb.cpp
     undistort.cpp
     FindEssentialMatrix.cpp
@@ -69,8 +69,8 @@ target_link_libraries( main ${OpenCV_LIBS} )
 add_executable( kit ${HEADERS} ${KIT}  )
 target_link_libraries( kit ${OpenCV_LIBS} )
 
-add_executable( sgbm ${HEADERS} ${SGBM}  )
-target_link_libraries( sgbm ${OpenCV_LIBS} )
+add_executable( matching ${HEADERS} ${MATCHING}  )
+target_link_libraries( matching ${OpenCV_LIBS} )
 
 add_executable(ba bundle_adjustment.cpp)
 target_link_libraries(ba ${G2O_LIBS}  ${OpenCV_LIBS})

@@ -9,7 +9,19 @@ using namespace cv;
 // 参考： https://docs.opencv.org/3.4/d2/d85/classcv_1_1StereoSGBM.html
 
 // 目前仅支持rectified的kitti
+// 目前支持的dense matching methods: block matching & semi-global matching
+// 使用方法 ./matching bm 或 ./matching sgbm
 int main(int argc, char*argv[]){
+
+    int matching_method;
+    if(argc > 1){
+        if(strcmp(argv[1],"bm")==0) matching_method = BLOCK_MATCHING;
+        else matching_method = SEMI_GLOBAL_MATCHING;
+    }
+    else
+        matching_method = SEMI_GLOBAL_MATCHING;  // SEMI_GLOBAL_MATCHING or BLOCK_MATCHING
+
+    
 
     struct Dataset dataset;
     dataset.name = KITTI_TEST;  // 选择所需要的数据集
@@ -42,17 +54,35 @@ int main(int argc, char*argv[]){
         int max_disp = 80; // 决定最近距离
         int wsize = 9;
         Mat left_disp;
-        Ptr<StereoSGBM> left_matcher  = StereoSGBM::create(5, max_disp, wsize);
-        left_matcher->setP1(24*wsize*wsize);  
-        left_matcher->setP2(96*wsize*wsize);  
-        // left_matcher->setPreFilterCap(70);
-        left_matcher->setMode(StereoSGBM::MODE_SGBM);  // MODE_HH4 performs the best in the experiment until now 
-        // left_matcher->setDisp12MaxDiff(consistency); 
-        // left_matcher->setUniquenessRatio(20);
-        // left_matcher->setSpeckleRange(1);
-        // left_matcher->setSpeckleWindowSize(2000);           
-        // matching_time = (double)getTickCount();
-        left_matcher-> compute(img_1, img_2, left_disp); 
+
+        if(matching_method == SEMI_GLOBAL_MATCHING){
+            Ptr<StereoSGBM> left_matcher  = StereoSGBM::create(5, max_disp, wsize);
+            left_matcher->setP1(24*wsize*wsize);  
+            left_matcher->setP2(96*wsize*wsize);  
+            // left_matcher->setPreFilterCap(70);
+            left_matcher->setMode(StereoSGBM::MODE_SGBM);
+            // left_matcher->setDisp12MaxDiff(consistency); 
+            // left_matcher->setUniquenessRatio(20);
+            // left_matcher->setSpeckleRange(1);
+            // left_matcher->setSpeckleWindowSize(2000);           
+            // matching_time = (double)getTickCount();
+            left_matcher-> compute(img_1, img_2, left_disp); 
+        }
+        else if(matching_method == BLOCK_MATCHING){
+            Mat img_1_gray, img_2_gray;
+            // img_1.convertTo(img_1_gray, CV_8UC1);
+            // img_2.convertTo(img_2_gray, CV_8UC1);
+            cv::cvtColor(img_1, img_1_gray, CV_BGR2GRAY);
+            cv::cvtColor(img_2, img_2_gray, CV_BGR2GRAY);
+
+            if(DEBUG_PRINT){
+                cout<<"img_1_gray.type(): "<<img_1_gray.type()<<endl;
+                cout<<"img_2_gray.type(): "<<img_2_gray.type()<<endl;
+            }
+            Ptr<StereoBM> bm = StereoBM::create(max_disp, wsize);
+            bm->compute(img_1_gray, img_2_gray, left_disp);
+        }
+
         if(DEBUG_PRINT){
             cout<<"left_disp.type(): "<<left_disp.type()<<endl;
             cout<<"left_disp.at<short>(38,226): "<<left_disp.at<short>(38,226)<<endl;
@@ -79,11 +109,22 @@ int main(int argc, char*argv[]){
             _depth_vis = depth/10;
             _depth_vis.convertTo(depth_vis, CV_8U);
             cv::imshow("left_disparity", left_disp_vis);
-            cv::imshow("depth_vis (单位: 分米)", depth_vis);
+            
             // cv::imwrite("left_disp_vis.png", left_disp_vis);
+
+            // 这一步的目的仅仅是为了将depth_vis中的255都置为0， 为了得到和block matching相似的视觉效果
+            for(int h = 0; h<depth_vis.rows; h++){
+                for(int w = 0; w<depth_vis.cols; w++){
+                    if(depth_vis.at<uchar>(h, w) == 255)
+                        depth_vis.at<uchar>(h, w) = 0;
+                }
+            }
+
+            cv::imshow("depth_vis (单位: 分米)", depth_vis);
             cv::imwrite("depth_vis_decimeter.jpg", depth_vis);  // 输出以米为单位的深度图
             cv::waitKey(0);
         }
+        
 
         PointCloudGenerate(depth, img_1, dataset, i);
     }

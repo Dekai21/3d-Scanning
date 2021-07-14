@@ -64,6 +64,14 @@
 - point cloud
   ![pc1](./results/kitti_test_pointcloud00.png)
   ![pc2](./results/kitti_test_pointcloud01.png)
+- depth maps from block matching and semi-global matching
+  - block matching
+    - ![depth_bm](./results/depth_vis_decimeter_bm.jpg)
+  - semi-global matching
+    - ![depth_sgbm](./results/depth_vis_decimeter_sgbm.jpg)
+    - 注: 相比上图, 这里的depth map中的255均被替换为0
+  
+  
 
   <!-- - 八点法
   

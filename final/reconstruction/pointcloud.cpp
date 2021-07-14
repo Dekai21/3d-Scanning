@@ -20,7 +20,9 @@ struct Vertex
 
 bool WriteMesh(Vertex* vertices, unsigned int width, unsigned int height, const std::string& filename)
 {
-	float edgeThreshold = 0.01f; // 1cm
+	// float edgeThreshold = 0.01f; // 1cm
+	float edgeThreshold = 0.10f; // 10 cm
+	// float edgeThreshold = 10.0f; // 目前这里相当于取消了限制
 
 	// TODO: Get number of vertices
 	unsigned int nVertices = width * height;
