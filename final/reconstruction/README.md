@@ -1,27 +1,18 @@
 # Reconstruction
-- 相机外参的计算
-  - 八点法 + 全局法: 采用ORB, SIFT
-  - Bundle Adjustment: 采用ORB, SIFT
-  - 先在undistort的左图上手动选点, 然后根据指定的r和t计算出右图上对应的点, 采用八点法看看能不能恢复出正确的r和t
-  - 采用bundle adjustment来看看能不能恢复相应的点, 虽然我觉得点的数量不足可能会造成困难
-  - 验证orb结合八点法和bundle adjustment的表现
-  - 估计orb+八点法表现很差, 所以分析一下原因
+- update: 之前八点法后进行reconstruction的时候, scale我理解的有问题, 现在已经修复了
+- 目前估计R和t的流程是采用ORB或者SIFT进行八点法, 然后将结果送入bundle adjustment中进行优化, 但是这个结果的精度我个人觉得不足以做到很好的rectify
+- 我觉得实验可以分为两个部分: 
+  - 1. 已知R和t的ground truth, 分别使用ORB和SIFT分别计算R和t, 然后再送入bundle adjustment中进行优化, 计算这个估计值的误差
+  - 2. 使用数据集中rectified后的图像进行block matching, semi-global matching和学习的方法进行深度估计, 然后评估质量
 
-- Rectify
-  - to do: 但是感觉即使用bundle adjustment得到的R和t精度也不够
-- Dense matching
-  - block matching
-  - semi global matching
-  - 基于学习
-- 深度图质量评估
-  - to do 
-- 可视化: 输出点云 + mesh
 
 # Dataset 
 - KITTI_TEST
   - ./test_images/kitti_test_01
   - 这个数据集中包含左右两张图像， 是KITTI中rectified的两张图像(rectified KITTI - 2011_09_26_drive_0113_sync - 0.png)
   - 增加: 2011_09_26_drive_0048_sync - 1.png
+- KITTI_2015
+  - 杨谦益所选的带有深度ground truth的图像
 - MATLAB_TEST
   - ./test_images/matlab
   - 这个数据集中包含左右两张rectified的图像，来源于CV2的exe6

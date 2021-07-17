@@ -72,10 +72,10 @@ String GetDirPath(struct Dataset dataset){
     }
     else if(dataset.name == KITTI_2015){
         if(dataset.rectified == 1){
-            dir_path = "/home/dekai/3d_scanning/final/reconstruction/test_images/kitti_2015/rectified";
+            dir_path = "../test_images/kitti_2015/rectified";
         }
         else{
-            dir_path = "/home/dekai/3d_scanning/final/reconstruction/test_images/kitti_2015/unrectified";
+            dir_path = "../test_images/kitti_2015/unrectified";
         }
     }
 
