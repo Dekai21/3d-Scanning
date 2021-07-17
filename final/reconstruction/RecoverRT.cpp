@@ -48,7 +48,7 @@ struct transformation RecoverRT(Mat R1, Mat R2, Mat T, vector<Point2f> keypoints
     // assert(count_success == 1);
     if(count_success != 1){
         cout<<"the number of the correct solution of R and t should be 1"<<endl;
-        exit(0);
+        // exit(0);
     }
     return transformation_return;
 }

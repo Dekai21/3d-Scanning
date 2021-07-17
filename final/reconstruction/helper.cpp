@@ -4,7 +4,8 @@ using namespace std;
 using namespace cv;
 
 void GetIntrinsics(struct Dataset dataset, cv::Mat& left_rgb_camera_matrix, cv::Mat& right_rgb_camera_matrix){
-    if(dataset.name == KITTI_2011_09_26_drive_0048 || dataset.name == KITTI_2011_09_26_drive_0113 || dataset.name == KITTI_TEST || dataset.name == CHESSBOARD){
+    if(dataset.name == KITTI_2011_09_26_drive_0048 || dataset.name == KITTI_2011_09_26_drive_0113 || 
+       dataset.name == KITTI_TEST || dataset.name == CHESSBOARD || dataset.name == KITTI_2015){
         if(dataset.rectified == 1){
             // rectified camera parameters
             // K_02
@@ -68,6 +69,14 @@ String GetDirPath(struct Dataset dataset){
     
     else if(dataset.name == CHESSBOARD){
         dir_path = "../test_images/chessboard";
+    }
+    else if(dataset.name == KITTI_2015){
+        if(dataset.rectified == 1){
+            dir_path = "/home/dekai/3d_scanning/final/reconstruction/test_images/kitti_2015/rectified";
+        }
+        else{
+            dir_path = "/home/dekai/3d_scanning/final/reconstruction/test_images/kitti_2015/unrectified";
+        }
     }
 
     if(dir_path.length() == 0){

@@ -47,6 +47,7 @@ set(SOURCES
     FindEssentialMatrix.cpp
     RecoverRT.cpp
     helper.cpp
+    Rectify_KITTI.cpp
 )
 
 set(KIT
@@ -91,6 +92,12 @@ set(BA
     sift.cpp
 )
 
+set(RECTIFY
+    rectify.cpp
+    helper.cpp
+    Rectify_KITTI.cpp
+)
+
 
 add_executable( main ${HEADERS} ${SOURCES}  )
 target_link_libraries( main ${OpenCV_LIBS} )
@@ -109,3 +116,6 @@ target_link_libraries( test_exp  ${OpenCV_LIBS})
 
 add_executable( simulation ${HEADERS} ${SIMULATION} )
 target_link_libraries( simulation  ${OpenCV_LIBS})
+
+add_executable( rectify ${HEADERS} ${RECTIFY} )
+target_link_libraries( rectify  ${OpenCV_LIBS})

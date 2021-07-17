@@ -1,6 +1,6 @@
 #include "include.h"
 
-#define DEBUG_PRINT 1
+#define DEBUG_PRINT 0
 #define IMAGE_SHOW 1
 
 using namespace std;
@@ -9,8 +9,8 @@ using namespace cv;
 
 const String keys =
         "{help h usage ? |                  | print this message                                                }"
-        "{num_keypoints    |40                 | number of keypoints after filtering                               }"    
-        "{detector  |orb               | keypoint detector: orb or sift                                      }";
+        "{num_keypoints  |40                | number of keypoints after filtering                               }"    
+        "{detector       |orb               | keypoint detector: orb or sift                                    }";
 
 int main(int argc, char*argv[]){
 
@@ -30,7 +30,7 @@ int main(int argc, char*argv[]){
     // }
 
     struct Dataset dataset;
-    dataset.name = KITTI_TEST;  // 选择所需要的数据集
+    dataset.name = KITTI_2015;  // 选择所需要的数据集
     // dataset.name = MATLAB_TEST;
     dataset.rectified = 0;
     dataset.distort = 1;
@@ -111,6 +111,13 @@ int main(int argc, char*argv[]){
         
 
         // 根据R和T对图像进行rectify
+        if(!transformation.t.empty()){
+            Mat left_original = imread ( left, CV_LOAD_IMAGE_COLOR );
+            Mat right_original = imread ( right, CV_LOAD_IMAGE_COLOR );
+            Mat rectified_left, rectified_right;
+            Rectify_KITTI(transformation.R, transformation.t, left_original, right_original, rectified_left, rectified_right);
+        }
+
 
         // 对rectify后的图像进行disparity计算
     }

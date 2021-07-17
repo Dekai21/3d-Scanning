@@ -19,7 +19,7 @@ struct transformation{
     cv::Mat t;
 };
 
-enum name_set{KITTI_2011_09_26_drive_0048, KITTI_2011_09_26_drive_0113, KITTI_TEST, MATLAB_TEST, CHESSBOARD};
+enum name_set{KITTI_2011_09_26_drive_0048, KITTI_2011_09_26_drive_0113, KITTI_TEST, MATLAB_TEST, CHESSBOARD, KITTI_2015};
 
 enum stereo_matching{SEMI_GLOBAL_MATCHING, BLOCK_MATCHING};
 
@@ -75,3 +75,5 @@ void getFilesList(String dirpath, vector<String> &left_image_paths, vector<Strin
 
 
 void PointCloudGenerate(cv::Mat depth_map, cv::Mat rgb_map, struct Dataset dataset, int file_order);
+
+int Rectify_KITTI(Mat R23, Mat t23, Mat left_original, Mat right_original, Mat& rectified_left, Mat& rectified_right);

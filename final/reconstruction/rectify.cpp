@@ -1,4 +1,5 @@
 #include"include.h"
+
 #define DEBUG_PRINT 0
 #define IMAGE_SHOW 1
 
@@ -6,16 +7,17 @@ using namespace cv;
 using namespace std;
 
 int main(int argc, char*argv[]){
+    String left = "/home/dekai/3d_scanning/final/reconstruction/test_images/kitti_test_01/image_02/data/left_unrectified.png";
+    String right = "/home/dekai/3d_scanning/final/reconstruction/test_images/kitti_test_01/image_03/data/right_unrectified.png";
+    Mat left_original = imread ( left, CV_LOAD_IMAGE_COLOR );
+    Mat right_original = imread ( right, CV_LOAD_IMAGE_COLOR );
+    Mat rectified_left, rectified_right;
+    Mat R23 = (cv::Mat_<double>(3,3) <<  0.999371,   0.0210911,  -0.0285063,
+                                       -0.0210506,   0.999777,    0.00172109,
+                                        0.0285362,  -0.00111993,  0.999592);
 
-
-    // tuyang 801
-    ir_distortion_coeffs = (cv::Mat_<double>(1,12)<<0.147751, 0.402135, -0.000574, -0.000963,
-                                                    0.134576, 0.403372, 0.385723, 0.254154,
-                                                    0.001764, -0.000431, 0.000827, -0.000298);
-    
-    ir2_distortion_coeffs = (cv::Mat_<double>(1,12) << -0.406042, -0.268743, -0.001174, -0.001153,
-                                                       -0.029927, -0.150741, -0.416733, -0.076622,
-                                                       0.002466, 0.000227, 0.001892, -0.000645);
+    Mat t23 = (cv::Mat_<double>(3,1) <<  -0.523653, 0.010085, -0.0973426);
+    Rectify_KITTI(R23, t23, left_original, right_original, rectified_left, rectified_right);
 
     return 0; 
 }

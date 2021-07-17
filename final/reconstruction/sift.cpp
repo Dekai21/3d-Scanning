@@ -2,7 +2,7 @@
 #include <opencv2/xfeatures2d.hpp>
 
 #define IMAGE_SHOW 1
-#define DEBUG_PRINT 1
+#define DEBUG_PRINT 0
 
 using namespace std;
 using namespace cv;
