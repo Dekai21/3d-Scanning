@@ -1,7 +1,8 @@
 #include "include.h"
+#include <fstream>
 
 #define DEBUG_PRINT 0
-#define IMAGE_SHOW 1
+#define IMAGE_SHOW 0
 
 using namespace std;
 using namespace cv;
@@ -40,6 +41,12 @@ int main(int argc, char*argv[]){
     String dir_path = GetDirPath(dataset);
     vector<String> left_image_paths, right_image_paths;
     getFilesList(dir_path, left_image_paths, right_image_paths);
+
+    std::stringstream filename;
+    filename << "rt_" << detector << "_" << num_keypoints <<".txt";
+    // std::string filename = "rt.txt";
+    std::ofstream outFile(filename.str(), ios::out | ios::app);
+	if (!outFile.is_open()) return false;
 
     for(int i = 0; i<left_image_paths.size(); i++){
         
@@ -112,15 +119,27 @@ int main(int argc, char*argv[]){
 
         // 根据R和T对图像进行rectify
         if(!transformation.t.empty()){
-            Mat left_original = imread ( left, CV_LOAD_IMAGE_COLOR );
-            Mat right_original = imread ( right, CV_LOAD_IMAGE_COLOR );
-            Mat rectified_left, rectified_right;
-            Rectify_KITTI(transformation.R, transformation.t, left_original, right_original, rectified_left, rectified_right);
+            // Mat left_original = imread ( left, CV_LOAD_IMAGE_COLOR );
+            // Mat right_original = imread ( right, CV_LOAD_IMAGE_COLOR );
+            // Mat rectified_left, rectified_right;
+            // Rectify_KITTI(transformation.R, transformation.t, left_original, right_original, rectified_left, rectified_right);
+
+            outFile << transformation.R.at<double>(0,0) << " " << transformation.R.at<double>(0,1) << " " << transformation.R.at<double>(0,2) << " " 
+                << transformation.R.at<double>(1,0) << " " << transformation.R.at<double>(1,1) << " " << transformation.R.at<double>(1,2) << " " 
+                << transformation.R.at<double>(2,0) << " " << transformation.R.at<double>(2,1) << " " << transformation.R.at<double>(2,2) << std::endl;
+            outFile << transformation.t.at<double>(0,0) << " " << transformation.t.at<double>(1,0) << " " << transformation.t.at<double>(2,0) << std::endl;
+
         }
 
 
         // 对rectify后的图像进行disparity计算
+
+
+    
     }
+
+	// close file
+	outFile.close();
 
 
 

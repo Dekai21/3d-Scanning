@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.spatial.transform import Rotation as R
+from scipy.spatial.transform import Rotation as R, rotation
 
 T_02 = np.array([5.956621e-02, 2.900141e-04, 2.577209e-03])
 T_03 = np.array([-4.731050e-01, 5.551470e-03, -5.250882e-03])
@@ -22,43 +22,47 @@ print('R_23', R_23)
 
 r = R.from_matrix(R_23)
 
-r_euler = r.as_euler('zyx', degrees=True)
-print('r_euler', r_euler)
+r_euler_gt = r.as_euler('zyx', degrees=True)
+print('r_euler_gt', r_euler_gt)
 
+r_eulers = []
+ts = []
 
-# ground truth
-# T23 [-0.53267121  0.00526146 -0.00782809]
+f = open("./rt_orb_40_ba.txt")
+line = f.readline()
+while line:
+    str_list = line.split(" ")
+    if(len(str_list) == 9):
+        _R = np.zeros((3,3))
+        for i in range(3):
+            for j in range(3):
+                _R[i, j] = str_list[i*3+j]
+        r = R.from_matrix(_R)
+        r_euler = r.as_euler('zyx', degrees=True)
+        r_eulers.append(r_euler)
+    elif(len(str_list) == 3):
+        _t = np.zeros(3)
+        for i in range(3):
+            _t[i] = str_list[i]
+        ts.append(_t)        
+    line = f.readline()
+f.close()
 
-# R_23 [[ 0.99955716  0.02225614 -0.01975307]
-#  [-0.02222673  0.99975152  0.00170718]
-#  [ 0.01978616 -0.00126738  0.99980347]]
+r_euler_error = []
+print("r_eulers: ")
+for r_euler in r_eulers:
+    # print(r_euler)
+    r_euler_error.append(abs(r_euler - r_euler_gt))
 
-# r_euler [-1.27553715 -1.13184123 -0.09783354]
+r_euler_error = np.array(r_euler_error)
+r_euler_error = np.mean(r_euler_error, axis=0)
+print(r_euler_error)
 
+t_error = []
+print("ts: ")
+for t in ts:
+    t_error.append(np.linalg.norm(t - T23))
 
-# result
-# R: [0.9996847321281889, 0.02333824274224507, -0.009260819374934438;
-#  -0.02359096283361033, 0.9993241901599044, -0.02818917228005423;
-#  0.008596675076698639, 0.02839875678538437, 0.9995597069663573]
-# t: [-0.5319969138335164;
-#  0.02770001715898749;
-#  -0.001253187421257889]
-
-# 0.999435    0.0223351   -0.0251338    
-#   -0.0223131      0.99975   0.00115619   
-#    0.0251534 -0.000594725     0.999683
-
-# R_tmp = np.array([[0.9996847321281889, 0.02333824274224507, -0.009260819374934438],
-# [-0.02359096283361033, 0.9993241901599044, -0.02818917228005423],
-# [0.008596675076698639, 0.02839875678538437, 0.9995597069663573]])
-
-# r2 = R.from_matrix(R_tmp)
-# print(r2.as_euler('zyx', degrees=True))
-
-# R_tmp2 = np.array([[0.999435,    0.0223351,   -0.0251338],    
-#                 [-0.0223131,      0.99975,   0.00115619],   
-#                 [0.0251534, -0.000594725,     0.999683]])
-
-# r3 = R.from_matrix(R_tmp2)
-
-# print(r3.as_euler('zyx', degrees=True))
+t_error = np.array(t_error)
+t_error = np.mean(t_error)
+print(t_error)

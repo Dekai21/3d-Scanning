@@ -150,6 +150,36 @@ const String keys =
 //     return true;
 // }
 
+void ReadTransformRecord(string filename, vector<Mat>& Rotations, vector<Mat>& translations){
+    ifstream in;
+    in.open(filename);
+	string line;
+    int flag = 0;
+    double _R[9];
+    double _t[3];
+
+	while (getline(in, line)){//将in文件中的每一行字符读入到string line中
+		stringstream ss(line);//使用string初始化stringstream
+        Mat R = Mat::zeros(cv::Size(3,3), CV_64FC1);
+        Mat t = Mat::zeros(cv::Size(1,3), CV_64FC1);
+        double x;
+        if(flag % 2 == 0){
+            for(int i = 0; i<9; i++) ss >> _R[i];
+            for(int i = 0; i<3; i++)
+                for(int j = 0; j<3; j++)
+                    R.at<double>(i, j) = _R[i*3+j];
+            Rotations.push_back(R);
+        }
+        else{
+            for(int i = 0; i<3; i++) ss >> _t[i];
+            for(int i = 0; i<3; i++) t.at<double>(i, 0) = _t[i];
+            translations.push_back(t);
+        }
+        flag++;
+	}
+
+}
+
 
 // 使用方法： ./ba ${匹配点的数量} ${iteration} ${init_z}
 // 选择 200+ 对匹配可以获得比较好的效果，默认为240对
@@ -158,9 +188,7 @@ const String keys =
 int main( int argc, char** argv ){
 
     CommandLineParser parser(argc, argv, keys);
-    // parser.about("Disparity Filtering Demo");
-    if (parser.has("help"))
-    {
+    if (parser.has("help")){
         parser.printMessage();
         return 0;
     }
@@ -171,30 +199,46 @@ int main( int argc, char** argv ){
     String detector = parser.get<String>("detector");
 
     struct Dataset dataset;
-    dataset.name = KITTI_TEST;  // 选择所需要的数据集
-    // dataset.name = MATLAB_TEST;
+    dataset.name = KITTI_2015;  // 选择所需要的数据集
     dataset.rectified = 0;
-    dataset.distort = 0;
+    dataset.distort = 1;
     dataset.given_points = 0; // 手动给点还是用特征点检测
 
-    cv::Mat img1 = cv::imread( "/home/dekai/3d_scanning/final/reconstruction/build/undistorted_left_image.png" ); 
-    cv::Mat img2 = cv::imread( "/home/dekai/3d_scanning/final/reconstruction/build/undistorted_right_image.png" ); 
-    
-    // int num_keypoints;
-    // if(argc >= 2)
-    //     num_keypoints = atoi(argv[1]);
-    // else 
-    //     num_keypoints = 240;
+    // 对kitti数据集中的img2和img3文件夹进行遍历
+    String dir_path = GetDirPath(dataset);
+    vector<String> left_image_paths, right_image_paths;
+    getFilesList(dir_path, left_image_paths, right_image_paths);
 
-    // int iter = 20;
-    // if(argc == 3){
-    //     iter = atoi(argv[2]);
-    // }
+    std::stringstream filename;
+    filename << "rt_" << detector << "_" << num_keypoints <<"_ba.txt";
+    // std::string filename = "rt.txt";
+    std::ofstream outFile(filename.str(), ios::out | ios::app);
+	if (!outFile.is_open()) return false;
 
-    // double z = 10.0;
-    // if(argc == 4){
-    //     z = (double)atof(argv[3]);
-    // }
+    string in_filename = "/home/dekai/3d_scanning/final/reconstruction/build/rt_orb_40.txt";
+    vector<Mat> Rotations;
+    vector<Mat> translations;
+    ReadTransformRecord(in_filename, Rotations, translations);
+
+    int record = 0; 
+
+    for(int i_image = 0; i_image<left_image_paths.size(); i_image++){
+
+        
+        
+        String left = left_image_paths[i_image];
+        String right = right_image_paths[i_image];
+
+        Mat img1 = imread ( left, CV_LOAD_IMAGE_COLOR );
+        Mat img2 = imread ( right, CV_LOAD_IMAGE_COLOR );
+
+        // // 如果读取的是undistorted和rectified的图像可以注销该部分
+        if(dataset.distort == 1){
+            Mat undistort_1, undistort_2;
+            Undistort(img1, img2, undistort_1, undistort_2);
+            img1 = undistort_1;
+            img2 = undistort_2; // swallow copy or deep copy?
+        }
 
 
     cout<<"choose_match_num: "<<num_keypoints<<endl;
@@ -234,9 +278,14 @@ int main( int argc, char** argv ){
     // 选择正确的R和T
     Mat lambda = Mat::zeros(cv::Size(1, num_keypoints), CV_64FC1);
     struct transformation transformation = RecoverRT_2(R1, R2, T, pts1, pts2, dataset, lambda);
-    cout<<"lambda: "<<lambda<<endl;
+    // cout<<"lambda: "<<lambda<<endl;
 
+    cout<<"R: "<<transformation.R<<endl;
+    cout<<"t: "<<transformation.t<<endl;
+    system("pause");
+    if(!transformation.R.empty()){
 
+    
 
     g2o::SparseOptimizer optimizer;
     typedef g2o::BlockSolver<g2o::BlockSolverTraits<6, 3>> BlockSolverType;  // 这里是9还是6？
@@ -265,14 +314,20 @@ int main( int argc, char** argv ){
         else{
             g2o::Vector3 _t;
             // _t << -0.5268885591265065, 0.03775366888076277, -0.06893971645823953;
-             _t << -0.4883209864189943, 0.02270631091623175, 0.2116993514989185;
+            //  _t << -0.4883209864189943, 0.02270631091623175, 0.2116993514989185;
+            _t << translations[record].at<double>(0,0),translations[record].at<double>(1,0),translations[record].at<double>(2,0);
             g2o::Matrix3 _R;
             // _R << 0.9996847321281889, 0.02333824274224507, -0.009260819374934438,
             //     -0.02359096283361033, 0.9993241901599044, -0.02818917228005423,
             //     0.008596675076698639, 0.02839875678538437, 0.9995597069663573;
-            _R << 0.9996822443615183, 0.01291140343696726, -0.02164961823232908, 
-                -0.01246159322056104, 0.999706312018693, 0.02078457130635199,
-                0.02191161798505531, -0.02050817815583449, 0.9995495463587611;
+
+            // _R << 0.9996822443615183, 0.01291140343696726, -0.02164961823232908, 
+            //     -0.01246159322056104, 0.999706312018693, 0.02078457130635199,
+            //     0.02191161798505531, -0.02050817815583449, 0.9995495463587611;
+            _R << Rotations[record].at<double>(0, 0),Rotations[record].at<double>(0, 1),Rotations[record].at<double>(0, 2),
+                  Rotations[record].at<double>(1, 0),Rotations[record].at<double>(1, 1),Rotations[record].at<double>(1, 2),
+                  Rotations[record].at<double>(2, 0),Rotations[record].at<double>(2, 1),Rotations[record].at<double>(2, 2);
+            record++;
             // _R = g2o::Matrix3::Identity();
             v->setEstimate(g2o::SE3Quat(_R, _t));
         }
@@ -286,8 +341,8 @@ int main( int argc, char** argv ){
         g2o::VertexSBAPointXYZ* v = new g2o::VertexSBAPointXYZ();
         v->setId( 2 + i );
         // 由于深度不知道，只能把深度设置为1了
-        z = lambda.at<double>(i);
-        // double z = 10.0;
+        // z = lambda.at<double>(i);
+        double z = 10.0;
 
         double x = ( pts1[i].x - cx ) * z / fx; 
         double y = ( pts1[i].y - cy ) * z / fy; 
@@ -347,7 +402,15 @@ int main( int argc, char** argv ){
     g2o::VertexSE3Expmap* v = dynamic_cast<g2o::VertexSE3Expmap*>( optimizer.vertex(1) );
     Eigen::Isometry3d pose = v->estimate();
     cout<<"Pose="<<endl<<pose.matrix()<<endl;
-    cout<<"translation: "<<pose.translation()/pose.translation().norm()*0.5327190420453419<<endl;;
+    cout<<"translation: "<<pose.translation()/pose.translation().norm()*0.5327190420453419<<endl;
+
+    Eigen::Vector3d translation = pose.translation()/pose.translation().norm()*0.5327190420453419;
+
+    outFile << pose.rotation()(0,0) << " " << pose.rotation()(0,1) << " " << pose.rotation()(0,2) << " " <<
+               pose.rotation()(1,0) << " " << pose.rotation()(1,1) << " " << pose.rotation()(1,2) << " " <<
+               pose.rotation()(2,0) << " " << pose.rotation()(2,1) << " " << pose.rotation()(2,2) << std::endl;
+    
+    outFile << translation(0) << " " << translation(1) << " " << translation(2) << std::endl;
 
     // 以及所有特征点的位置
     for ( size_t i=0; i<pts1.size(); i++ )
@@ -379,7 +442,9 @@ int main( int argc, char** argv ){
 
     // return 0;
 
-
+    }
+    }
+    outFile.close();
     return 0; 
 }
 

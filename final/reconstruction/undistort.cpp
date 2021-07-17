@@ -1,6 +1,6 @@
 #include"include.h"
 #define DEBUG_PRINT 0
-#define IMAGE_SHOW 1
+#define IMAGE_SHOW 0
 
 using namespace cv;
 using namespace std;

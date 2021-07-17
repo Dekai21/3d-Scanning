@@ -1,7 +1,7 @@
 #include "include.h"
 #include <opencv2/xfeatures2d.hpp>
 
-#define IMAGE_SHOW 1
+#define IMAGE_SHOW 0
 #define DEBUG_PRINT 0
 
 using namespace std;

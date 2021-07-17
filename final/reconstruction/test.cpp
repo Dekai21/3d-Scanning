@@ -1,4 +1,5 @@
 #include "include.h"
+#include <fstream>
 
 #define DEBUG_PRINT 1
 #define IMAGE_SHOW 1
@@ -6,98 +7,52 @@
 using namespace std;
 using namespace cv;
 
-int main(int argc, char*argv[]){
 
-    // String left = "/home/dekai/datasets/2011_09_26_drive_0119/2011_09_26_drive_0119_extract/2011_09_26/2011_09_26_drive_0119_extract/image_02/data/0000000000.png";
-    // String right = "/home/dekai/datasets/2011_09_26_drive_0119/2011_09_26_drive_0119_extract/2011_09_26/2011_09_26_drive_0119_extract/image_03/data/0000000000.png";
+void ReadTransformRecord(string filename, vector<Mat>& Rotations, vector<Mat>& translations){
+    ifstream in;
+    in.open(filename);
+	string line;
+    int flag = 0;
+    double _R[9];
+    double _t[3];
 
-    // // 读取图像
-    // Mat img_1 = imread ( left, CV_LOAD_IMAGE_COLOR );
-    // Mat img_2 = imread ( right, CV_LOAD_IMAGE_COLOR );
-
-    // Mat undistort_1, undistort_2;
-    // Undistort(img_1, img_2, undistort_1, undistort_2);
-    // img_1 = undistort_1;
-    // img_2 = undistort_2; // swallow copy or deep copy?
-    
-
-    struct Dataset dataset;
-    // dataset.name = KITTI_TEST;  // 选择所需要的数据集
-    dataset.name = CHESSBOARD;
-    dataset.rectified = 0;
-    dataset.distort = 0;
-    dataset.given_points = 1; // 手动给点还是用特征点检测
-
-    // 对kitti数据集中的img2和img3文件夹进行遍历
-    String dir_path = GetDirPath(dataset);
-    vector<String> left_image_paths, right_image_paths;
-    getFilesList(dir_path, left_image_paths, right_image_paths);
-
-    for(int i = 0; i<left_image_paths.size(); i++){
-        
-        String left = left_image_paths[i];
-        String right = right_image_paths[i];
-
-        // 读取图像
-        Mat img_1 = imread ( left, CV_LOAD_IMAGE_COLOR );
-        Mat img_2 = imread ( right, CV_LOAD_IMAGE_COLOR );
-        if(IMAGE_SHOW){
-            imshow("img_1", img_1);
-            waitKey(0);
-        }
-        
-        // // 如果读取的是undistorted和rectified的图像可以注销该部分
-        if(dataset.distort == 1){
-            Mat undistort_1, undistort_2;
-            Undistort(img_1, img_2, undistort_1, undistort_2);
-            img_1 = undistort_1;
-            img_2 = undistort_2; // swallow copy or deep copy?
-        }
-
-        vector<Point2f> keypoints_left; 
-        vector<Point2f> keypoints_right;
-        size_t num_keypoints = 40;
-
-        if(dataset.given_points == 1){
-            GetPoints(keypoints_left, keypoints_right, dataset);
-
-            // show given points
-            for(auto point:keypoints_left){
-                cv::circle(img_1, point, 5, cv::Scalar(0, 0, 255), 1, cv::LINE_8, 0);
-                imshow("img_1", img_1);            
-            }
-            waitKey(0);
+	while (getline(in, line)){//将in文件中的每一行字符读入到string line中
+		stringstream ss(line);//使用string初始化stringstream
+        Mat R = Mat::zeros(cv::Size(3,3), CV_64FC1);
+        Mat t = Mat::zeros(cv::Size(1,3), CV_64FC1);
+        double x;
+        if(flag % 2 == 0){
+            for(int i = 0; i<9; i++) ss >> _R[i];
+            for(int i = 0; i<3; i++)
+                for(int j = 0; j<3; j++)
+                    R.at<double>(i, j) = _R[i*3+j];
+            Rotations.push_back(R);
         }
         else{
-            // 采用ORB进行特征点检测
-            OrbDetector(img_1, img_2, keypoints_left, keypoints_right, num_keypoints);
-            // if(DEBUG_PRINT) cout<<"keypoints_left.size(): "<<keypoints_left.size()<<endl;
-        }        
-                
-        Mat fundamental_mat = findFundamentalMat(keypoints_left, keypoints_right,  cv::FM_8POINT);
-        // cout<<"fundamental_mat: " << fundamental_mat << endl;
-        Mat essential_mat = FindEssentialMatrix(fundamental_mat, dataset);
-        // cout<<"essential_mat: "<<essential_mat<<endl;
-
-        // 由本质矩阵恢复出R和T, 注意这里的T仅表示方向，因为其L2-norm固定为1
-        Mat R1, R2, T;
-        decomposeEssentialMat(essential_mat, R1, R2, T);
-
-        // 选择正确的R和T
-        struct transformation transformation = RecoverRT(R1, R2, T, keypoints_left, keypoints_right, dataset);
-        if(DEBUG_PRINT){
-            cout<<"R and t from eight-point method:"<<endl;
-            cout<<"R: "<<transformation.R<<endl;
-            cout<<"t: "<<transformation.t<<endl<<endl;
+            for(int i = 0; i<3; i++) ss >> _t[i];
+            for(int i = 0; i<3; i++) t.at<double>(i, 0) = _t[i];
+            translations.push_back(t);
         }
-        
+        flag++;
+	}
 
-        // 根据R和T对图像进行rectify
+}
 
-        // 对rectify后的图像进行disparity计算
+int main(int argc, char*argv[]){
+
+    string filename = "/home/dekai/3d_scanning/final/reconstruction/build/rt_sift_40.txt";
+    vector<Mat> Rotations;
+    vector<Mat> translations;
+    ReadTransformRecord(filename, Rotations, translations);
+    for(auto R:Rotations){
+        cout<<R<<endl;
+        cout<<"###"<<endl;
     }
-
-
+    cout<<"***"<<endl;
+    for(auto t:translations){
+        cout<<t<<endl;
+        cout<<"###"<<endl;
+    }
 
     return 0;
 }

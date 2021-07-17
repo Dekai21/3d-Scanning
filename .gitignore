@@ -26,3 +26,4 @@ final/g2o*/
 !final/reconstruction/test_images/kitti_test_01/*/data/
 !final/reconstruction/test_images/*/*/data/
 !final/reconstruction/test_images/*/*/*/data/
+!final/reconstruction/log.txt
