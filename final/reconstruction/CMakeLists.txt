@@ -42,6 +42,7 @@ set(HEADERS
 set(SOURCES
     main.cpp
     orb.cpp
+    sift.cpp
     undistort.cpp
     FindEssentialMatrix.cpp
     RecoverRT.cpp
@@ -62,6 +63,34 @@ set(MATCHING
     pointcloud.cpp
 )
 
+set(TEST_EXP
+    test.cpp
+    orb.cpp
+    undistort.cpp
+    FindEssentialMatrix.cpp
+    RecoverRT.cpp
+    helper.cpp
+)
+
+set(SIMULATION
+    simulation.cpp
+    orb.cpp
+    undistort.cpp
+    FindEssentialMatrix.cpp
+    RecoverRT.cpp
+    helper.cpp
+)
+
+set(BA
+    bundle_adjustment.cpp
+    undistort.cpp
+    FindEssentialMatrix.cpp
+    RecoverRT.cpp
+    helper.cpp
+    orb.cpp
+    sift.cpp
+)
+
 
 add_executable( main ${HEADERS} ${SOURCES}  )
 target_link_libraries( main ${OpenCV_LIBS} )
@@ -72,5 +101,11 @@ target_link_libraries( kit ${OpenCV_LIBS} )
 add_executable( matching ${HEADERS} ${MATCHING}  )
 target_link_libraries( matching ${OpenCV_LIBS} )
 
-add_executable(ba bundle_adjustment.cpp)
+add_executable(ba ${HEADERS} ${BA})
 target_link_libraries(ba ${G2O_LIBS}  ${OpenCV_LIBS})
+
+add_executable( test_exp ${HEADERS} ${TEST_EXP} )
+target_link_libraries( test_exp  ${OpenCV_LIBS})
+
+add_executable( simulation ${HEADERS} ${SIMULATION} )
+target_link_libraries( simulation  ${OpenCV_LIBS})

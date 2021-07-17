@@ -1,22 +1,21 @@
 # Reconstruction
-- 特征点检测和匹配
-  - ORB
-  - to do: SIFT
-- 计算R和t
-  - 八点法获取R和t + 特征点深度
-  - bundle adjustment计算R和t + 特征点深度
+- 相机外参的计算
+  - 八点法 + 全局法: 采用ORB, SIFT
+  - Bundle Adjustment: 采用ORB, SIFT
+  - 先在undistort的左图上手动选点, 然后根据指定的r和t计算出右图上对应的点, 采用八点法看看能不能恢复出正确的r和t
+  - 采用bundle adjustment来看看能不能恢复相应的点, 虽然我觉得点的数量不足可能会造成困难
+  - 验证orb结合八点法和bundle adjustment的表现
+  - 估计orb+八点法表现很差, 所以分析一下原因
+
 - Rectify
   - to do: 但是感觉即使用bundle adjustment得到的R和t精度也不够
 - Dense matching
+  - block matching
   - semi global matching
   - 基于学习
-  - to do： 
-    - block matching
-    - 调参面板
 - 深度图质量评估
   - to do 
-- 可视化: 由深度图和相机内参得到点云
-  - to do
+- 可视化: 输出点云 + mesh
 
 # Dataset 
 - KITTI_TEST
@@ -142,3 +141,25 @@
   $$ -->
 
 
+<!-- MATLAB TEST
+>>> import numpy as np
+>>> a = np.array([-0.4427, -0.0166, 0.8965])
+>>> a
+array([-0.4427, -0.0166,  0.8965])
+>>> np.linalg.norm(a)
+0.9999855498955972
+>>> gamma = 0.0081
+>>> gamma * a
+array([-0.00358587, -0.00013446,  0.00726165]) -->
+
+
+先测试在八点法的基础上，bundle adjustment能否使结果改善
+评估r和t的代码
+将得到的r和t用于rectify
+
+计算R和t的ground truth
+计算R对应的欧拉角
+由八点法得到R和t
+使用bundle adjustment进行优化
+
+/usr/include/opencv2/xfeatures2d.hpp

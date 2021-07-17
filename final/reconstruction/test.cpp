@@ -6,35 +6,27 @@
 using namespace std;
 using namespace cv;
 
-
-const String keys =
-        "{help h usage ? |                  | print this message                                                }"
-        "{num_keypoints    |40                 | number of keypoints after filtering                               }"    
-        "{detector  |orb               | keypoint detector: orb or sift                                      }";
-
 int main(int argc, char*argv[]){
 
-    CommandLineParser parser(argc, argv, keys);
-    // parser.about("Disparity Filtering Demo");
-    if (parser.has("help"))
-    {
-        parser.printMessage();
-        return 0;
-    }
-    int num_keypoints = parser.get<int>("num_keypoints");
+    // String left = "/home/dekai/datasets/2011_09_26_drive_0119/2011_09_26_drive_0119_extract/2011_09_26/2011_09_26_drive_0119_extract/image_02/data/0000000000.png";
+    // String right = "/home/dekai/datasets/2011_09_26_drive_0119/2011_09_26_drive_0119_extract/2011_09_26/2011_09_26_drive_0119_extract/image_03/data/0000000000.png";
 
-    String detector = parser.get<String>("detector");
-    // int num_keypoints = 40;
-    // if(argc == 2){
-    //     num_keypoints = atoi(argv[1]);
-    // }
+    // // 读取图像
+    // Mat img_1 = imread ( left, CV_LOAD_IMAGE_COLOR );
+    // Mat img_2 = imread ( right, CV_LOAD_IMAGE_COLOR );
+
+    // Mat undistort_1, undistort_2;
+    // Undistort(img_1, img_2, undistort_1, undistort_2);
+    // img_1 = undistort_1;
+    // img_2 = undistort_2; // swallow copy or deep copy?
+    
 
     struct Dataset dataset;
-    dataset.name = KITTI_TEST;  // 选择所需要的数据集
-    // dataset.name = MATLAB_TEST;
+    // dataset.name = KITTI_TEST;  // 选择所需要的数据集
+    dataset.name = CHESSBOARD;
     dataset.rectified = 0;
-    dataset.distort = 1;
-    dataset.given_points = 0; // 手动给点还是用特征点检测
+    dataset.distort = 0;
+    dataset.given_points = 1; // 手动给点还是用特征点检测
 
     // 对kitti数据集中的img2和img3文件夹进行遍历
     String dir_path = GetDirPath(dataset);
@@ -64,7 +56,7 @@ int main(int argc, char*argv[]){
 
         vector<Point2f> keypoints_left; 
         vector<Point2f> keypoints_right;
-        // size_t num_keypoints = 40;
+        size_t num_keypoints = 40;
 
         if(dataset.given_points == 1){
             GetPoints(keypoints_left, keypoints_right, dataset);
@@ -77,18 +69,8 @@ int main(int argc, char*argv[]){
             waitKey(0);
         }
         else{
-            if(detector == "orb"){
-                // 采用ORB进行特征点检测
-                OrbDetector(img_1, img_2, keypoints_left, keypoints_right, (size_t)num_keypoints);
-            }
-            else if(detector == "sift"){
-                SiftDetector(img_1, img_2, keypoints_left, keypoints_right, (size_t)num_keypoints);
-            }
-            else{
-                cout<<"ERROR: kein keypoint detect method."<<endl;
-                exit(0);
-            }
-
+            // 采用ORB进行特征点检测
+            OrbDetector(img_1, img_2, keypoints_left, keypoints_right, num_keypoints);
             // if(DEBUG_PRINT) cout<<"keypoints_left.size(): "<<keypoints_left.size()<<endl;
         }        
                 

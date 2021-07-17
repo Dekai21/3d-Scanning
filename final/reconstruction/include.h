@@ -10,10 +10,6 @@
 
 #include "Eigen.h"
 
-// #include <pcl/common/transforms.h>
-// #include <pcl/filters/filter.h>
-// #include <pcl/point_cloud.h>
-// #include <pcl/point_types.h>
 
 using namespace std;
 using namespace cv;
@@ -23,7 +19,7 @@ struct transformation{
     cv::Mat t;
 };
 
-enum name_set{KITTI_2011_09_26_drive_0048, KITTI_2011_09_26_drive_0113, KITTI_TEST, MATLAB_TEST};
+enum name_set{KITTI_2011_09_26_drive_0048, KITTI_2011_09_26_drive_0113, KITTI_TEST, MATLAB_TEST, CHESSBOARD};
 
 enum stereo_matching{SEMI_GLOBAL_MATCHING, BLOCK_MATCHING};
 
@@ -48,6 +44,10 @@ int OrbDetector (Mat img_1, Mat img_2,
                  size_t num_keypoints);
 
 
+int SiftDetector (Mat img_1, Mat img_2, 
+                 vector<Point2f>& keypoints_left, vector<Point2f>& keypoints_right, 
+                 size_t num_keypoints);
+
 /**
  * 对图像进行去畸变
  */
@@ -59,6 +59,7 @@ Mat FindEssentialMatrix(Mat fundamental_mat, struct Dataset dataset);
 
 // 从R和t的4种可能组合中获取正确的解(根据CV2的slide 6中的方法)
 struct transformation RecoverRT(Mat R1, Mat R2, Mat T, vector<Point2f> keypoints_left, vector<Point2f> keypoints_right, struct Dataset dataset);
+struct transformation RecoverRT_2(Mat R1, Mat R2, Mat T, vector<Point2f> keypoints_left, vector<Point2f> keypoints_right, struct Dataset dataset, Mat& lambda);
 
 // 获取相机内参
 void GetIntrinsics(struct Dataset dataset, cv::Mat& left_rgb_camera_matrix, cv::Mat& right_rgb_camera_matrix);

@@ -102,7 +102,7 @@ int main(int argc, char*argv[]){
             exit(0);
         }
         if(IMAGE_SHOW){
-            Mat _left_disp_vis = left_disp / 14;
+            Mat _left_disp_vis = left_disp / 16;
             Mat left_disp_vis;
             _left_disp_vis.convertTo(left_disp_vis, CV_8U);
             Mat _depth_vis, depth_vis;
@@ -110,7 +110,7 @@ int main(int argc, char*argv[]){
             _depth_vis.convertTo(depth_vis, CV_8U);
             cv::imshow("left_disparity", left_disp_vis);
             
-            // cv::imwrite("left_disp_vis.png", left_disp_vis);
+            cv::imwrite("left_disp_vis.png", left_disp_vis);
 
             // 这一步的目的仅仅是为了将depth_vis中的255都置为0， 为了得到和block matching相似的视觉效果
             for(int h = 0; h<depth_vis.rows; h++){

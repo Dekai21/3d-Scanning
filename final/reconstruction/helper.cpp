@@ -4,7 +4,7 @@ using namespace std;
 using namespace cv;
 
 void GetIntrinsics(struct Dataset dataset, cv::Mat& left_rgb_camera_matrix, cv::Mat& right_rgb_camera_matrix){
-    if(dataset.name == KITTI_2011_09_26_drive_0048 || dataset.name == KITTI_2011_09_26_drive_0113 || dataset.name == KITTI_TEST){
+    if(dataset.name == KITTI_2011_09_26_drive_0048 || dataset.name == KITTI_2011_09_26_drive_0113 || dataset.name == KITTI_TEST || dataset.name == CHESSBOARD){
         if(dataset.rectified == 1){
             // rectified camera parameters
             // K_02
@@ -58,9 +58,16 @@ String GetDirPath(struct Dataset dataset){
         if(dataset.rectified == 1){
             dir_path = "../test_images/kitti_test_01";
         }
+        else{
+            dir_path = "../test_images/kitti_test_01";
+        }
     }
     else if(dataset.name == MATLAB_TEST){
         dir_path = "../test_images/matlab";
+    }
+    
+    else if(dataset.name == CHESSBOARD){
+        dir_path = "../test_images/chessboard";
     }
 
     if(dir_path.length() == 0){
@@ -93,6 +100,16 @@ void GetPoints(vector<cv::Point2f>& keypoints_left, vector<cv::Point2f>& keypoin
         float _y1[12] = {111.0, 57.0, 186.0, 69.0, 98.0, 136.0, 165.0, 241.0, 55.0, 276.0, 207.0, 236.0};
         float _x2[12] = {259.0, 370.0, 373.0, 410.0, 428.0, 413.0, 429.0, 893.0, 949.0, 457.0, 675.0, 114.0};
         float _y2[12] = {111.0, 57.0, 187.0, 69.0, 98.0, 137.0, 165.0, 241.0, 57.0, 277.0, 209.0, 236.0};
+        for(int i=0; i<12; i++){
+            x1[i] = _x1[i]; y1[i] = _y1[i]; x2[i] = _x2[i]; y2[i] = _y2[i];
+        }
+    }
+    else if(dataset.name == CHESSBOARD){
+        // unrectified KITTI - chessboard
+        float _x1[12] = {227.0, 1225.0, 1190.0, 1082.0, 956.0, 646.0, 536.0, 450.0, 583.0, 820.0, 830.0, 881.0};
+        float _y1[12] = {199.0, 282.0, 92.0, 435.0, 472.0, 465.0, 466.0, 290.0, 106.0, 151.0, 323.0, 403.0};
+        float _x2[12] = {131.0, 1101.0, 1037.0, 947.0, 827.0, 544.0, 439.0, 378.0, 481.0, 727.0, 742.0, 791.0};
+        float _y2[12] = {213.0, 270.0, 93.0, 416.0, 454.0, 456.0, 459.0, 294.0, 117.0, 156.0, 317.0, 390.0};
         for(int i=0; i<12; i++){
             x1[i] = _x1[i]; y1[i] = _y1[i]; x2[i] = _x2[i]; y2[i] = _y2[i];
         }
