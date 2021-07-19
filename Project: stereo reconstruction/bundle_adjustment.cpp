@@ -248,9 +248,9 @@ int main( int argc, char** argv ){
     if(detector == "orb"){
         num_keypoints_after_filter = OrbDetector( img1, img2, pts1, pts2, num_keypoints);
     }
-    else if(detector == "sift"){
-        num_keypoints_after_filter = SiftDetector( img1, img2, pts1, pts2, num_keypoints);
-    }
+    // else if(detector == "sift"){
+    //     num_keypoints_after_filter = SiftDetector( img1, img2, pts1, pts2, num_keypoints);
+    // }
     else{
         cout<<"ERROR: kein keypoint detect method."<<endl;
         exit(0);
@@ -282,7 +282,7 @@ int main( int argc, char** argv ){
 
     cout<<"R: "<<transformation.R<<endl;
     cout<<"t: "<<transformation.t<<endl;
-    system("pause");
+    // system("pause");
     if(!transformation.R.empty()){
 
     

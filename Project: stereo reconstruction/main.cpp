@@ -88,9 +88,9 @@ int main(int argc, char*argv[]){
                 // 采用ORB进行特征点检测
                 OrbDetector(img_1, img_2, keypoints_left, keypoints_right, (size_t)num_keypoints);
             }
-            else if(detector == "sift"){
-                SiftDetector(img_1, img_2, keypoints_left, keypoints_right, (size_t)num_keypoints);
-            }
+            // else if(detector == "sift"){
+            //     SiftDetector(img_1, img_2, keypoints_left, keypoints_right, (size_t)num_keypoints);
+            // }
             else{
                 cout<<"ERROR: kein keypoint detect method."<<endl;
                 exit(0);
